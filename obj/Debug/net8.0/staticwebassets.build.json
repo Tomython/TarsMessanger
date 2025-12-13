@@ -1,0 +1,39 @@
+{
+  "Version": 1,
+  "Hash": "FuVEQTPnnAmsQ+wna1rWZ1MwSLFEH9iJizTSGMi7e7c=",
+  "Source": "TarsMessanger",
+  "BasePath": "_content/TarsMessanger",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "TarsMessanger/wwwroot",
+      "Source": "TarsMessanger",
+      "ContentRoot": "/Users/tomython/Documents/Visual Studio Code Project/TarsMessanger/wwwroot/",
+      "BasePath": "_content/TarsMessanger",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "/Users/tomython/Documents/Visual Studio Code Project/TarsMessanger/wwwroot/index.html",
+      "SourceId": "TarsMessanger",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/tomython/Documents/Visual Studio Code Project/TarsMessanger/wwwroot/",
+      "BasePath": "_content/TarsMessanger",
+      "RelativePath": "index.html",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/index.html"
+    }
+  ]
+}
