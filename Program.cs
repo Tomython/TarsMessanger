@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Microsoft.AspNetCore.Mvc;  // ← ДОБАВИТЬ
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseUrls("http://0.0.0.0:8080");
@@ -13,13 +13,23 @@ builder.Services.AddControllers();  // ← ДОБАВИТЬ ЭТУ СТРОКУ
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql("Host=host.docker.internal;Port=5432;Database=messenger;Username=messenger;Password=SecurePass123"));
 
-// JWT + остальное
+// JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options => { /* ... */ });
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new()
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("super-secret-key-min-32-chars-long")),
+            ValidateIssuer = false,
+            ValidateAudience = false
+        };
+    });
 
 builder.Services.AddAuthorization();
 builder.Services.AddSignalR();
-builder.Services.AddCors(/* ... */);
+builder.Services.AddCors(options => 
+    options.AddDefaultPolicy(p => p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 
 var app = builder.Build();
 app.UseCors();
