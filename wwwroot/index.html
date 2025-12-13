@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="viewport" content="width=device-width"><title>Chat MVP</title>
+<style>body{font-family:sans-serif;max-width:400px;margin:auto;padding:20px;}#messages{max-height:300px;overflow:auto;border:1px solid #ccc;padding:10px;}</style></head>
+<body>
+<input id="username" placeholder="Ваш username"><button onclick="join()">Join</button>
+<input id="to" placeholder="Кому"><input id="message" placeholder="Сообщение"><button onclick="send()">Send</button>
+<div id="messages"></div>
+<script src="https://unpkg.com/@microsoft/signalr@latest/dist/browser/signalr.min.js"></script>
+<script>
+let connection;
+function join() {
+    connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
+    connection.on("ReceiveMessage", (fromId, msg) => document.getElementById("messages").innerHTML += `<p>From ${fromId}: ${msg}</p>`);
+    connection.start().then(() => connection.invoke("Join", document.getElementById("username").value));
+}
+function send() { connection.invoke("SendMessage", document.getElementById("to").value, document.getElementById("message").value); }
+</script>
+</body>
+</html>

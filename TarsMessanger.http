@@ -1,0 +1,6 @@
+@TarsMessanger_HostAddress = http://localhost:5008
+
+GET {{TarsMessanger_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
