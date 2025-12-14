@@ -11,7 +11,7 @@ builder.WebHost.UseUrls("http://0.0.0.0:8080");
 // Controllers + PostgreSQL
 builder.Services.AddControllers();  // ← ДОБАВИТЬ ЭТУ СТРОКУ
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql("Host=host.docker.internal;Port=5432;Database=messenger;Username=messenger;Password=SecurePass123"));
+    options.UseNpgsql("Host=host.docker.internal;Port=5433;Database=messenger;Username=messenger;Password=SecurePass123"));
 
 // JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
