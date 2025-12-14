@@ -4,24 +4,29 @@ using Microsoft.AspNetCore.SignalR;
 [Authorize]  // Только авторизованные
 public class ChatHub : Hub
 {
-    private static Dictionary<string, string> OnlineUsers = new();
+
+    private static Dictionary<string, string> _users = new();
+    private static Dictionary<string, HashSet<string>> _connections = new();
+
+    public override async Task OnConnectedAsync()
+    {
+        _connections[Context.ConnectionId] = new HashSet<string>();
+        await base.OnConnectedAsync();
+    }
 
     public async Task Join(string username)
     {
-        OnlineUsers[username] = Context.ConnectionId;
+        _users[Context.ConnectionId] = username;
         await Clients.All.SendAsync("UserJoined", username);
     }
 
     public async Task SendMessage(string toUsername, string message)
     {
-        if (OnlineUsers.TryGetValue(toUsername, out var connId))
-            await Clients.Client(connId).SendAsync("ReceiveMessage", Context.UserIdentifier, message);
+        if (_users.TryGetValue(Context.ConnectionId, out var fromUsername))
+        {
+            await Clients.All.SendAsync("ReceiveMessage", fromUsername, toUsername, message);
+        }
     }
 
-    public override async Task OnDisconnectedAsync(Exception? exception)
-    {
-        var username = OnlineUsers.FirstOrDefault(x => x.Value == Context.ConnectionId).Key;
-        OnlineUsers.Remove(username);
-        await base.OnDisconnectedAsync(exception);
-    }
+
 }
