@@ -1,23 +1,101 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width">
-    <title>Chat MVP</title>
-<style>body{font-family:sans-serif;max-width:400px;margin:auto;padding:20px;}#messages{max-height:300px;overflow:auto;border:1px solid #ccc;padding:10px;}</style></head>
+    <title>TarsMessenger</title>
+    <style>
+        body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; margin: 0; height: 100vh; background: #f5f5f5; }
+        .chat-container { max-width: 400px; height: 100vh; margin: auto; display: flex; flex-direction: column; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { background: #007AFF; color: white; padding: 15px; text-align: center; font-weight: 600; }
+        .users { padding: 10px; background: #f8f9fa; border-bottom: 1px solid #eee; max-height: 150px; overflow: auto; }
+        .user { padding: 8px; cursor: pointer; border-radius: 8px; margin: 2px 0; }
+        .user:hover { background: #e3f2fd; }
+        .user.active { background: #007AFF; color: white; }
+        .messages { flex: 1; padding: 15px; overflow: auto; background: white; }
+        .message { margin: 10px 0; padding: 8px 12px; border-radius: 18px; max-width: 80%; word-wrap: break-word; }
+        .message.sent { background: #007AFF; color: white; margin-left: auto; text-align: right; }
+        .message.received { background: #e5e5ea; color: #000; }
+        .input-area { padding: 15px; border-top: 1px solid #eee; display: flex; gap: 10px; }
+        input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 25px; outline: none; }
+        button { padding: 12px 20px; background: #007AFF; color: white; border: none; border-radius: 25px; cursor: pointer; }
+        button:hover { background: #0056cc; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+    </style>
+</head>
 <body>
-<input id="username" placeholder="Ваш username"><button onclick="join()">Join</button>
-<input id="to" placeholder="Кому"><input id="message" placeholder="Сообщение"><button onclick="send()">Send</button>
-<div id="messages"></div>
-<script src="https://unpkg.com/@microsoft/signalr@latest/dist/browser/signalr.min.js"></script>
-<script>
-let connection;
-function join() {
-    connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
-    connection.on("ReceiveMessage", (fromId, msg) => document.getElementById("messages").innerHTML += `<p>From ${fromId}: ${msg}</p>`);
-    connection.start().then(() => connection.invoke("Join", document.getElementById("username").value));
-}
-function send() { connection.invoke("SendMessage", document.getElementById("to").value, document.getElementById("message").value); }
-</script>
+    <div class="chat-container">
+        <div class="header">
+            <div>TarsMessenger</div>
+            <small>Онлайн: <span id="onlineCount">0</span></small>
+        </div>
+        <div class="users" id="usersList"></div>
+        <div class="messages" id="messages"></div>
+        <div class="input-area">
+            <input id="username" placeholder="Ваш username" maxlength="20">
+            <button id="joinBtn" onclick="joinChat()">Присоединиться</button>
+        </div>
+        <div class="input-area" id="chatArea" style="display:none;">
+            <input id="toUser" placeholder="Кому..." list="userlist" disabled>
+            <input id="message" placeholder="Сообщение..." disabled>
+            <button onclick="sendMessage()" disabled>Отправить</button>
+        </div>
+    </div>
+    <datalist id="userlist"></datalist>
+
+    <script src="https://unpkg.com/@microsoft/signalr@8/dist/browser/signalr.min.js"></script>
+    <script>
+        let connection;
+        let currentUser;
+
+        function joinChat() {
+            currentUser = document.getElementById('username').value.trim();
+            if (!currentUser) return alert('Введите username');
+
+            connection = new signalR.HubConnectionBuilder()
+                .withUrl("/chatHub")
+                .build();
+
+            connection.on("UserJoined", (username) => {
+                addMessage(`${username} присоединился к чату`);
+                updateUsersList();
+            });
+
+            connection.on("ReceiveMessage", (fromUser, toUser, message) => {
+                if (toUser === currentUser || fromUser === currentUser) {
+                    addMessage(`${fromUser} → ${toUser}: ${message}`, fromUser === currentUser);
+                }
+            });
+
+            connection.start().then(() => {
+                connection.invoke("Join", currentUser);
+                document.getElementById('joinBtn').disabled = true;
+                document.getElementById('username').disabled = true;
+                document.getElementById('chatArea').style.display = 'flex';
+                document.querySelectorAll('#toUser, #message, button[onclick="sendMessage()"]').forEach(el => el.disabled = false);
+            }).catch(err => console.error('SignalR Error:', err));
+        }
+
+        function sendMessage() {
+            const toUser = document.getElementById('toUser').value.trim();
+            const message = document.getElementById('message').value.trim();
+            if (!toUser || !message) return;
+
+            connection.invoke("SendMessage", toUser, message);
+            document.getElementById('message').value = '';
+        }
+
+        function addMessage(text, isSent = false) {
+            const messages = document.getElementById('messages');
+            const div = document.createElement('div');
+            div.className = `message ${isSent ? 'sent' : 'received'}`;
+            div.textContent = text;
+            messages.appendChild(div);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function updateUsersList() {
+            // SignalR автоматически обновит через UserJoined
+            document.getElementById('onlineCount').textContent = Object.keys(connection?.connectionId || {}).length;
+        }
+    </script>
 </body>
 </html>
