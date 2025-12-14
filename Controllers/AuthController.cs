@@ -11,6 +11,7 @@ using BCrypt.Net;
 public class AuthController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
+    
     public AuthController(ApplicationDbContext context) => _context = context;
 
     [HttpPost("register")]
@@ -19,11 +20,7 @@ public class AuthController : ControllerBase
         if (_context.Users.Any(u => u.Username == dto.Username))
             return BadRequest("Username exists");
 
-        var user = new User 
-        { 
-            Username = dto.Username, 
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password) 
-        };
+        var user = new User { Username = dto.Username, PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password) };
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
         return Ok(new { message = "Registered" });
