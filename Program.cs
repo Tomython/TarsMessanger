@@ -1,16 +1,14 @@
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseUrls("http://0.0.0.0:8080");
 
-builder.Services.AddControllers();
+// ТОЛЬКО SignalR + Controllers
+builder.Services.AddControllers().AddJsonOptions(opt => 
+    opt.JsonSerializerOptions.PropertyNamingPolicy = null);
 builder.Services.AddSignalR();
 
+// CORS для фронта + SignalR
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -22,6 +20,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// Middleware порядок
 app.UseCors("AllowAll");
 app.UseStaticFiles();
 app.MapControllers();
