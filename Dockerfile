@@ -1,8 +1,15 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-COPY . .
+
+# Copy project file first for better layer caching
+COPY TarsMessanger.csproj .
 RUN dotnet restore TarsMessanger.csproj
-RUN dotnet publish TarsMessanger.csproj -c Release -o /app/publish
+
+# Copy the rest of the source code
+COPY . .
+
+# Build and publish
+RUN dotnet publish TarsMessanger.csproj -c Release -o /app/publish --no-restore
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
