@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Microsoft.EntityFrameworkCore;
 using TarsMessanger.Data;
 using TarsMessanger.Models;
@@ -7,7 +8,7 @@ namespace TarsMessanger.Services;
 public class MessengerService : IMessengerService
 {
     private readonly MessengerDbContext _context;
-    private static readonly HashSet<int> _onlineUserIds = new();
+    private static readonly ConcurrentDictionary<int, bool> _onlineUserIds = new();  // userId → true (thread-safe)
 
     public MessengerService(MessengerDbContext context)
     {
@@ -26,7 +27,7 @@ public class MessengerService : IMessengerService
 
     public async Task<List<User>> GetOnlineUsersAsync()
     {
-        var onlineIds = _onlineUserIds.ToList();
+        var onlineIds = _onlineUserIds.Keys.ToList();
         return await _context.Users
             .Where(u => onlineIds.Contains(u.Id))
             .ToListAsync();
@@ -34,12 +35,12 @@ public class MessengerService : IMessengerService
 
     public void AddOnlineUser(int userId)
     {
-        _onlineUserIds.Add(userId);
+        _onlineUserIds.TryAdd(userId, true);
     }
 
     public void RemoveOnlineUser(int userId)
     {
-        _onlineUserIds.Remove(userId);
+        _onlineUserIds.TryRemove(userId, out _);
     }
 
     public async Task<Message> SaveMessageAsync(int senderId, int receiverId, string text)

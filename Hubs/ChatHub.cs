@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
@@ -11,7 +12,7 @@ public class ChatHub : Hub
 {
     private readonly IMessengerService _messengerService;
     private readonly MessengerDbContext _context;
-    private static readonly Dictionary<string, int> _connectionToUserId = new();  // connId → userId
+    private static readonly ConcurrentDictionary<string, int> _connectionToUserId = new();  // connId → userId (thread-safe)
 
     public ChatHub(IMessengerService messengerService, MessengerDbContext context)
     {
@@ -50,7 +51,7 @@ public class ChatHub : Hub
                 await Clients.All.SendAsync("UserListUpdate", await GetUserListAsync());
             }
             
-            _connectionToUserId.Remove(Context.ConnectionId);
+            _connectionToUserId.TryRemove(Context.ConnectionId, out _);
         }
         await base.OnDisconnectedAsync(exception);
     }
