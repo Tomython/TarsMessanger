@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TarsMessanger")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2df3637d8f5a74ec4afb5d040880b0954707146e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+61a9bba69f1809ca544ddbaf4adca95357d78f6f")]
 [assembly: System.Reflection.AssemblyProductAttribute("TarsMessanger")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TarsMessanger")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

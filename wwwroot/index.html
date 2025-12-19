@@ -1,101 +1,158 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TarsMessenger</title>
-    <style>
-        body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; margin: 0; height: 100vh; background: #f5f5f5; }
-        .chat-container { max-width: 400px; height: 100vh; margin: auto; display: flex; flex-direction: column; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .header { background: #007AFF; color: white; padding: 15px; text-align: center; font-weight: 600; }
-        .users { padding: 10px; background: #f8f9fa; border-bottom: 1px solid #eee; max-height: 150px; overflow: auto; }
-        .user { padding: 8px; cursor: pointer; border-radius: 8px; margin: 2px 0; }
-        .user:hover { background: #e3f2fd; }
-        .user.active { background: #007AFF; color: white; }
-        .messages { flex: 1; padding: 15px; overflow: auto; background: white; }
-        .message { margin: 10px 0; padding: 8px 12px; border-radius: 18px; max-width: 80%; word-wrap: break-word; }
-        .message.sent { background: #007AFF; color: white; margin-left: auto; text-align: right; }
-        .message.received { background: #e5e5ea; color: #000; }
-        .input-area { padding: 15px; border-top: 1px solid #eee; display: flex; gap: 10px; }
-        input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 25px; outline: none; }
-        button { padding: 12px 20px; background: #007AFF; color: white; border: none; border-radius: 25px; cursor: pointer; }
-        button:hover { background: #0056cc; }
-        button:disabled { background: #ccc; cursor: not-allowed; }
-    </style>
+    <link rel="stylesheet" href="/css/design-system.css">
+    <link rel="stylesheet" href="/css/components.css">
 </head>
 <body>
-    <div class="chat-container">
-        <div class="header">
-            <div>TarsMessenger</div>
-            <small>Онлайн: <span id="onlineCount">0</span></small>
-        </div>
-        <div class="users" id="usersList"></div>
-        <div class="messages" id="messages"></div>
-        <div class="input-area">
-            <input id="username" placeholder="Ваш username" maxlength="20">
-            <button id="joinBtn" onclick="joinChat()">Присоединиться</button>
-        </div>
-        <div class="input-area" id="chatArea" style="display:none;">
-            <input id="toUser" placeholder="Кому..." list="userlist" disabled>
-            <input id="message" placeholder="Сообщение..." disabled>
-            <button onclick="sendMessage()" disabled>Отправить</button>
+    <!-- Экран авторизации -->
+    <div id="authScreen" class="auth-screen">
+        <div class="auth-container">
+            <div class="auth-header">
+                <h1>TarsMessenger</h1>
+                <p>Войдите в свой аккаунт</p>
+            </div>
+            <div class="auth-form">
+                <div class="form-group">
+                    <label for="loginUsername">Имя пользователя</label>
+                    <input type="text" id="loginUsername" placeholder="Введите username" autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Пароль</label>
+                    <input type="password" id="loginPassword" placeholder="Введите пароль" autocomplete="current-password">
+                </div>
+                <button id="loginBtn" class="btn-primary">Войти</button>
+                <div class="auth-divider">
+                    <span>или</span>
+                </div>
+                <button id="showRegisterBtn" class="btn-secondary">Создать аккаунт</button>
+            </div>
+            <div id="registerForm" class="auth-form" style="display: none;">
+                <div class="form-group">
+                    <label for="registerUsername">Имя пользователя</label>
+                    <input type="text" id="registerUsername" placeholder="Введите username" autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">Email (необязательно)</label>
+                    <input type="email" id="registerEmail" placeholder="email@example.com" autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Пароль</label>
+                    <input type="password" id="registerPassword" placeholder="Введите пароль" autocomplete="new-password">
+                </div>
+                <button id="registerBtn" class="btn-primary">Зарегистрироваться</button>
+                <div class="auth-divider">
+                    <span>или</span>
+                </div>
+                <button id="showLoginBtn" class="btn-secondary">Войти в существующий аккаунт</button>
+            </div>
+            <div id="authError" class="auth-error" style="display: none;"></div>
         </div>
     </div>
-    <datalist id="userlist"></datalist>
+
+    <!-- Основной интерфейс мессенджера -->
+    <div id="appContainer" class="app-container" style="display: none;">
+        <!-- Левая панель навигации -->
+        <nav class="sidebar-nav">
+            <button class="nav-item active" data-tooltip="Чаты" id="navChats">
+                <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+            </button>
+            <button class="nav-item" data-tooltip="Контакты" id="navContacts">
+                <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.04-.96.08 1.16.84 1.96 1.96 1.96 3.42V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+            </button>
+            <button class="nav-item" data-tooltip="Настройки" id="navSettings">
+                <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+            </button>
+            <button class="nav-item" data-tooltip="Профиль" id="navProfile">
+                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </button>
+        </nav>
+
+        <!-- Центральная панель: Список чатов -->
+        <div class="chats-panel" id="chatsPanel">
+            <div class="chats-header">
+                <h1>Чаты</h1>
+                <div class="search-box">
+                    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                    <input type="text" id="searchInput" placeholder="Поиск чатов...">
+                </div>
+                <button class="icon-button" data-tooltip="Новый чат" id="newChatBtn">
+                    <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                </button>
+            </div>
+            <div class="chats-tabs">
+                <button class="tab-button active" id="tabChats">Чаты</button>
+                <button class="tab-button" id="tabGroups">Группы</button>
+            </div>
+            <div class="chats-list" id="chatsList">
+                <!-- Список чатов будет заполнен через JavaScript -->
+            </div>
+        </div>
+
+        <!-- Правая панель: Активный чат -->
+        <div class="chat-panel" id="chatPanel">
+            <div class="chat-empty" id="chatEmpty">
+                <div>
+                    <p>Выберите чат для начала общения</p>
+                </div>
+            </div>
+
+            <div class="chat-active" id="chatActive" style="display: none;">
+                <div class="chat-header">
+                    <button class="chat-header-back" id="backToChatsBtn" data-tooltip="Назад к чатам">
+                        <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                    </button>
+                    <div class="chat-header-avatar" id="chatHeaderAvatar">
+                        <span id="chatHeaderAvatarText">?</span>
+                    </div>
+                    <div class="chat-header-info">
+                        <div class="chat-header-name" id="chatHeaderName">Выберите чат</div>
+                        <div class="chat-header-status" id="chatHeaderStatus">
+                            <span class="status-indicator" id="chatHeaderStatusIndicator"></span>
+                            <span id="chatHeaderStatusText">Оффлайн</span>
+                        </div>
+                    </div>
+                    <div class="chat-header-actions">
+                        <button class="icon-button" data-tooltip="Звонок" id="callBtn">
+                            <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                        </button>
+                        <button class="icon-button" data-tooltip="Видеозвонок" id="videoCallBtn">
+                            <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+                        </button>
+                        <button class="icon-button" data-tooltip="Меню" id="chatMenuBtn">
+                            <svg viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="messages-container" id="messagesContainer">
+                    <!-- Сообщения будут добавлены через JavaScript -->
+                </div>
+
+                <div class="input-area">
+                    <div class="input-wrapper">
+                        <button class="icon-button" data-tooltip="Прикрепить файл" id="attachBtn" style="width: 32px; height: 32px;">
+                            <svg viewBox="0 0 24 24"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"/></svg>
+                        </button>
+                        <input type="text" id="messageInput" placeholder="Введите сообщение..." autocomplete="off">
+                        <div class="input-actions">
+                            <button class="icon-button" data-tooltip="Эмодзи" id="emojiBtn" style="width: 32px; height: 32px;">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <button class="send-button" id="sendBtn" data-tooltip="Отправить" disabled>
+                        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="https://unpkg.com/@microsoft/signalr@8/dist/browser/signalr.min.js"></script>
-    <script>
-        let connection;
-        let currentUser;
-
-        function joinChat() {
-            currentUser = document.getElementById('username').value.trim();
-            if (!currentUser) return alert('Введите username');
-
-            connection = new signalR.HubConnectionBuilder()
-                .withUrl("/chatHub")
-                .build();
-
-            connection.on("UserJoined", (username) => {
-                addMessage(`${username} присоединился к чату`);
-                updateUsersList();
-            });
-
-            connection.on("ReceiveMessage", (fromUser, toUser, message) => {
-                if (toUser === currentUser || fromUser === currentUser) {
-                    addMessage(`${fromUser} → ${toUser}: ${message}`, fromUser === currentUser);
-                }
-            });
-
-            connection.start().then(() => {
-                connection.invoke("Join", currentUser);
-                document.getElementById('joinBtn').disabled = true;
-                document.getElementById('username').disabled = true;
-                document.getElementById('chatArea').style.display = 'flex';
-                document.querySelectorAll('#toUser, #message, button[onclick="sendMessage()"]').forEach(el => el.disabled = false);
-            }).catch(err => console.error('SignalR Error:', err));
-        }
-
-        function sendMessage() {
-            const toUser = document.getElementById('toUser').value.trim();
-            const message = document.getElementById('message').value.trim();
-            if (!toUser || !message) return;
-
-            connection.invoke("SendMessage", toUser, message);
-            document.getElementById('message').value = '';
-        }
-
-        function addMessage(text, isSent = false) {
-            const messages = document.getElementById('messages');
-            const div = document.createElement('div');
-            div.className = `message ${isSent ? 'sent' : 'received'}`;
-            div.textContent = text;
-            messages.appendChild(div);
-            messages.scrollTop = messages.scrollHeight;
-        }
-
-        function updateUsersList() {
-            // SignalR автоматически обновит через UserJoined
-            document.getElementById('onlineCount').textContent = Object.keys(connection?.connectionId || {}).length;
-        }
-    </script>
+    <script src="/js/app.js"></script>
 </body>
 </html>
