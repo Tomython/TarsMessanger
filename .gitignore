@@ -1,0 +1,43 @@
+# Docker
+Dockerfile.*
+.dockerignore
+docker-compose.override.yml
+
+# Dependencies
+bin/
+obj/
+packages/
+
+# Build
+*.dll
+*.exe
+*.pdb
+*.cache
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# IDE
+.vscode/
+.vs/
+.idea/
+*.swp
+*.swo
+
+# EF Core
+Migrations/
+*.csproj.user
+
+# Data (будущая БД)
+data/
+postgres_data/
+
+# Environment
+.env
+*.env
