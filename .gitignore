@@ -31,7 +31,7 @@ ehthumbs.db
 *.swo
 
 # EF Core
-Migrations/
+# Migrations/ - включены в репозиторий для автоматического применения
 *.csproj.user
 
 # Data (будущая БД)
