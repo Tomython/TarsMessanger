@@ -1,8 +1,20 @@
 {
   "Files": [
     {
+      "Id": "/Users/tomython/Documents/Visual Studio Code Project/TarsMessanger/wwwroot/css/components.css",
+      "PackagePath": "staticwebassets/css/components.css"
+    },
+    {
+      "Id": "/Users/tomython/Documents/Visual Studio Code Project/TarsMessanger/wwwroot/css/design-system.css",
+      "PackagePath": "staticwebassets/css/design-system.css"
+    },
+    {
       "Id": "/Users/tomython/Documents/Visual Studio Code Project/TarsMessanger/wwwroot/index.html",
       "PackagePath": "staticwebassets/index.html"
+    },
+    {
+      "Id": "/Users/tomython/Documents/Visual Studio Code Project/TarsMessanger/wwwroot/js/app.js",
+      "PackagePath": "staticwebassets/js/app.js"
     },
     {
       "Id": "obj/Debug/net8.0/staticwebassets/msbuild.TarsMessanger.Microsoft.AspNetCore.StaticWebAssets.props",

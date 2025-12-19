@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "FuVEQTPnnAmsQ+wna1rWZ1MwSLFEH9iJizTSGMi7e7c=",
+  "Hash": "SqdHQKzfzTCm/favlde04uYTypmih/JYzWml5LFciac=",
   "Source": "TarsMessanger",
   "BasePath": "_content/TarsMessanger",
   "Mode": "Default",
@@ -16,6 +16,44 @@
     }
   ],
   "Assets": [
+    {
+      "Identity": "/Users/tomython/Documents/Visual Studio Code Project/TarsMessanger/wwwroot/css/components.css",
+      "SourceId": "TarsMessanger",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/tomython/Documents/Visual Studio Code Project/TarsMessanger/wwwroot/",
+      "BasePath": "_content/TarsMessanger",
+      "RelativePath": "css/components.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/css/components.css"
+    },
+    {
+      "Identity": "/Users/tomython/Documents/Visual Studio Code Project/TarsMessanger/wwwroot/css/design-system.css",
+      "SourceId": "TarsMessanger",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/tomython/Documents/Visual Studio Code Project/TarsMessanger/wwwroot/",
+      "BasePath": "_content/TarsMessanger",
+      "RelativePath": "css/design-system.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/css/design-system.css"
+    },
     {
       "Identity": "/Users/tomython/Documents/Visual Studio Code Project/TarsMessanger/wwwroot/index.html",
       "SourceId": "TarsMessanger",
@@ -34,6 +72,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/index.html"
+    },
+    {
+      "Identity": "/Users/tomython/Documents/Visual Studio Code Project/TarsMessanger/wwwroot/js/app.js",
+      "SourceId": "TarsMessanger",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/tomython/Documents/Visual Studio Code Project/TarsMessanger/wwwroot/",
+      "BasePath": "_content/TarsMessanger",
+      "RelativePath": "js/app.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/js/app.js"
     }
   ]
 }
